@@ -1,0 +1,34 @@
+---
+
+- name: Download and untar squid source tarball
+  shell: "cd /tmp/; if [ ! -f squid-{{squid_version}}.tar.gz ]; then wget http://www.squid-cache.org/Versions/v3/3.5/squid-{{squid_version}}.tar.gz; fi; tar -xzvf /tmp/squid-{{squid_version}}.tar.gz -C /usr/src/"
+
+- name: Get packages needed for squid/openssl
+  apt: name={{item}} state=installed
+  with_items:
+    - build-essential
+    - fakeroot
+    - devscripts
+    - gawk
+    - dpatch
+    - libssl-dev
+    - openssl
+    - ssl-cert
+    - dnsmasq
+    - libcrypto++-dev
+
+- name: Get squid dependency packages
+  shell: "apt-get -y build-dep squid3"
+
+- name: Get openssl dependency packages
+  shell: "apt-get -y build-dep openssl"
+
+- name: Configure squid with ICAP and SSL support
+  shell: "cd /usr/src/squid-{{squid_version}} && ./configure --prefix=/usr --includedir=/usr/include --sysconfdir=/etc/squid3 --datadir=/usr/share/squid3 --libexecdir=/usr/lib/squid3 --enable-ssl --enable-ssl-crtd --enable-icap-client --with-logdir=/var/log/squid3 --with-pidfile=/var/run/squid3.pid --with-default-user=proxy --with-openssl"
+
+- name: Build squid
+  shell: "cd /usr/src/squid-{{squid_version}} && make && make install"
+
+- name: Install service
+  shell: "cp /usr/src/squid-{{squid_version}}/tools/systemd/squid.service /lib/systemd/system/"
+

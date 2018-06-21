@@ -1,0 +1,9 @@
+---
+
+- hosts: all
+  user: root
+  roles:
+    - squid
+    - squid-conf
+    - iptables-rules-local
+    - e2guardian
