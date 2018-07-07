@@ -1,0 +1,152 @@
+---
+
+- name: Flush iptables
+  iptables:
+    flush: yes
+  become: yes
+
+- name: Flush iptables nat
+  iptables:
+    table: nat
+    flush: yes
+  become: yes
+
+- name: iptables - allow root traffic
+  iptables:
+    table: nat
+    chain: OUTPUT
+    uid_owner: root
+    jump: ACCEPT
+  become: yes
+
+- name: iptables - allow proxy traffic
+  iptables:
+    table: nat
+    chain: OUTPUT
+    uid_owner: root
+    jump: ACCEPT
+  become: yes
+
+- name: iptables - force HTTP traffic through proxy
+  iptables:
+    table: nat
+    chain: OUTPUT
+    protocol: tcp
+    destination_port: 80
+    jump: REDIRECT
+    to_ports: 3130
+  become: yes
+
+- name: iptables - force HTTPS traffic through proxy
+  iptables:
+    table: nat
+    chain: OUTPUT
+    protocol: tcp
+    destination_port: 80
+    jump: REDIRECT
+    to_ports: 3131
+  become: yes
+
+- name: iptables - allow SSH traffic
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: 22
+    jump: ACCEPT
+  become: yes
+
+- name: iptables - allow established and related connections
+  iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+  become: yes
+
+- name: iptables - block all other traffic
+  iptables:
+    chain: INPUT
+    jump: DROP
+  become: yes
+
+- name: iptables-save
+  shell: '/sbin/iptables-save > /etc/iptables/rules.4'
+
+- name: Flush ip6tables
+  iptables:
+    flush: yes
+    ip_version: ipv6
+  become: yes
+
+- name: Flush ip6tables nat
+  iptables:
+    table: nat
+    flush: yes
+    ip_version: ipv6
+  become: yes
+
+- name: ip6tables - allow root traffic
+  iptables:
+    table: nat
+    chain: OUTPUT
+    uid_owner: root
+    jump: ACCEPT
+    ip_version: ipv6
+  become: yes
+
+- name: ip6tables - allow proxy traffic
+  iptables:
+    table: nat
+    chain: OUTPUT
+    uid_owner: root
+    jump: ACCEPT
+    ip_version: ipv6
+  become: yes
+
+- name: ip6tables - force HTTP traffic through proxy
+  iptables:
+    table: nat
+    chain: OUTPUT
+    protocol: tcp
+    destination_port: 80
+    jump: REDIRECT
+    to_ports: 3130
+    ip_version: ipv6
+  become: yes
+
+- name: ip6tables - force HTTPS traffic through proxy
+  iptables:
+    table: nat
+    chain: OUTPUT
+    protocol: tcp
+    destination_port: 80
+    jump: REDIRECT
+    to_ports: 3131
+    ip_version: ipv6
+  become: yes
+
+- name: ip6tables - allow SSH traffic
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: 22
+    jump: ACCEPT
+    ip_version: ipv6
+  become: yes
+
+- name: ip6tables - allow established and related connections
+  iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+    ip_version: ipv6
+  become: yes
+
+- name: ip6tables - block all other traffic
+  iptables:
+    chain: INPUT
+    jump: DROP
+    ip_version: ipv6
+  become: yes
+
+- name: ip6tables-save
+  shell: '/sbin/ip6tables-save > /etc/iptables/rules.6'
