@@ -1,0 +1,2 @@
+# TODO: when 5.1 goes live, use the latest tag instead
+deb_file: 'https://github.com/justinschw/e2guardian-angel.git'
