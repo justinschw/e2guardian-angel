@@ -101,7 +101,18 @@ e-pcre=yes' '--enable-sslmitm=yes' 'CPPFLAGS=-mno-sse2 -g -O2'"
     dest: /etc/systemd/system/e2guardian.service
     state: link
 
-#  shell: "cp -f /usr/share/e2guardian/scripts/e2guardian.service /lib/systemd/system/ && ln -s /lib/systemd/system/e2guardian.service /etc/systemd/system/e2guardian.service"
+- name: create user
+  user:
+    name: e2guardian
+    state: present
+
+- name: assign log directory to user
+  file:
+    path: /var/log/e2guardian
+    owner: e2guardian
+    group: e2guardian
+    mode: 0755
+    state: directory
 
 - name: enable service
   shell: "systemctl enable e2guardian"

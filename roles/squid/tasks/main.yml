@@ -3,8 +3,15 @@
 - name: Download and untar squid source tarball
   shell: "cd /tmp/; if [ ! -f squid-{{squid_version}}.tar.gz ]; then wget http://www.squid-cache.org/Versions/v3/3.5/squid-{{squid_version}}.tar.gz; fi; tar -xzvf /tmp/squid-{{squid_version}}.tar.gz -C /usr/src/"
 
+- name: enable deb-src packages
+  shell: "sed -i 's~#deb-src~deb-src~g' /etc/apt/sources.list"
+
+- name: Update aptitude cache
+  apt:
+    update_cache: yes
+
 - name: Get packages needed for squid/openssl
-  apt: name={{item}} state=installed
+  apt: name={{item}} state=present
   with_items:
     - build-essential
     - fakeroot
